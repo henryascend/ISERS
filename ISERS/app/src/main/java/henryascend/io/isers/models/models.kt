@@ -3,7 +3,7 @@ package henryascend.io.isers.models
 import android.graphics.Rect
 
 
-data class FaceBounds(val id: Int, val box: Rect, val status: Int)
+data class FaceBounds(val id: Int, val box: Rect, val status: Int, val sleepy : Float)
 
 data class Frame(
     val data: ByteArray?,

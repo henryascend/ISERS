@@ -46,7 +46,7 @@ class FaceDetector(private val faceBoundsOverlay: FaceBoundsOverlay){
 
     private fun detectFacesIn(frame: Frame){
         frame.data?.let {
-            var full_image = convertFrameToImage(frame)
+            val full_image = convertFrameToImage(frame)
             firebaseFaceDetectorWrapper.process(
                 image = convertFrameToImage(frame),
                 onSuccess = {
@@ -71,14 +71,14 @@ class FaceDetector(private val faceBoundsOverlay: FaceBoundsOverlay){
             .build()
 
     private fun convertToListOfFaceBounds(faces: MutableList<FirebaseVisionFace>, full_Image: FirebaseVisionImage): List<FaceBounds> =
-        faces.map { FaceBounds(it.trackingId, it.boundingBox, getEmotionStatus(it.boundingBox, full_Image)  ) }
+        faces.map { FaceBounds(it.trackingId, it.boundingBox, getEmotionStatus(it.boundingBox, full_Image), (it.rightEyeOpenProbability + it.leftEyeOpenProbability) * 0.5f * 0.5f +  it.smilingProbability * 0.5f )   }
 
 
     private fun getEmotionStatus( box: Rect, image : FirebaseVisionImage ) : Int{
         val x =  max(box.centerX()-box.width()/2,0)
         val y = max(box.centerY()-box.height()/2, 0)
-        var width : Int
-        var height : Int
+        val width : Int
+        val height : Int
         if (image.bitmap.width - x >= box.width())
            width = box.width()
         else
@@ -88,9 +88,9 @@ class FaceDetector(private val faceBoundsOverlay: FaceBoundsOverlay){
             height = box.height()
         else
             height= image.bitmap.height - y
-        var bitmap = Bitmap.createBitmap(image.bitmap, x, y, width,height)
-        var reshape =  Bitmap.createScaledBitmap(bitmap,48,48, true)
-        var recognition = classifier_model.recognizeImage(reshape)
+        val bitmap = Bitmap.createBitmap(image.bitmap, x, y, width,height)
+        val reshape =  Bitmap.createScaledBitmap(bitmap,48,48, true)
+        val recognition = classifier_model.recognizeImage(reshape)
         Log.v("recognition", ""+recognition)
         return recognition
     }

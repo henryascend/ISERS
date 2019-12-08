@@ -33,7 +33,8 @@ class FaceBoundsOverlay @JvmOverloads constructor(
 
     private val anchorPaint = Paint()
     private val idPaint = Paint()
-    private val boundsPaint = Paint()
+    private val boundsPaint0 = Paint()
+    private val boundsPaint1 = Paint()
 
     var cameraPreviewWidth : Float = 0f
     var cameraPreviewHeight : Float = 0f
@@ -45,14 +46,19 @@ class FaceBoundsOverlay @JvmOverloads constructor(
 
 
     init{
-        anchorPaint.color = ContextCompat.getColor(context,android.R.color.holo_green_light)
+        anchorPaint.color = ContextCompat.getColor(context,android.R.color.white)
 
-        idPaint.color = ContextCompat.getColor(context, android.R.color.holo_green_light)
+        idPaint.color = ContextCompat.getColor(context, android.R.color.white)
         idPaint.textSize = 40f
 
-        boundsPaint.style = Paint.Style.STROKE
-        boundsPaint.color = ContextCompat.getColor(context, android.R.color.holo_green_light)
-        boundsPaint.strokeWidth = 4f
+
+        boundsPaint1.style = Paint.Style.STROKE
+        boundsPaint1.color = ContextCompat.getColor(context, android.R.color.holo_red_light)
+        boundsPaint1.strokeWidth = 4f
+
+        boundsPaint0.style = Paint.Style.STROKE
+        boundsPaint0.color = ContextCompat.getColor(context, android.R.color.white)
+        boundsPaint0.strokeWidth = 4f
     }
 
     /**
@@ -68,7 +74,8 @@ class FaceBoundsOverlay @JvmOverloads constructor(
     fun clearFaces(){
         faceBounds.clear()
         idPaint.clearShadowLayer()
-        boundsPaint.clearShadowLayer()
+        boundsPaint0.clearShadowLayer()
+        boundsPaint1.clearShadowLayer()
     }
 
     override fun onDraw(canvas: Canvas){
@@ -76,11 +83,11 @@ class FaceBoundsOverlay @JvmOverloads constructor(
         Log.v("facing",""+cameraFacing)
         Log.v("orientation",""+cameraOrientation)
         faceBounds.forEach {
-            val centerX = computeFaceBoundsCenterX(canvas.width.toFloat(),  scaleX(it.box.exactCenterX(), canvas) )
-            val centerY = computeFaceBoundsCenterY(canvas.height.toFloat(), scaleY(it.box.exactCenterY(), canvas) )
+            val centerX = computeFaceBoundsCenterX(width.toFloat() ,  scaleX(it.box.exactCenterX(), canvas) )
+            val centerY = computeFaceBoundsCenterY(height.toFloat(), scaleY(it.box.exactCenterY(), canvas) )
             drawAnchor(canvas,centerX,centerY)
-            drawId(canvas,it.id.toString(),centerX,centerY,emotionlabel[it.status])
-            drawBounds(it.box,canvas,centerX, centerY)
+            drawId(canvas,it.id.toString(),centerX,centerY,emotionlabel[it.status] )
+            drawBounds(it.box,canvas,centerX, centerY, it.sleepy)
         }
     }
 
@@ -133,26 +140,34 @@ class FaceBoundsOverlay @JvmOverloads constructor(
     }
 
     private fun drawId(canvas: Canvas, id: String, centerX: Float, centerY: Float, emotion: String) {
-        canvas.drawText(
-            "id $id : $emotion",
-            centerX - ID_OFFSET,
-            centerY + ID_OFFSET,
-            idPaint)
+            canvas.drawText(
+                "id $id : $emotion",
+                centerX - ID_OFFSET* 2.1f,
+                centerY + ID_OFFSET,
+                idPaint)
     }
 
-    private fun drawBounds(box: Rect, canvas: Canvas, centerX: Float, centerY: Float) {
+    private fun drawBounds(box: Rect, canvas: Canvas, centerX: Float, centerY: Float, sleepy :Float) {
         val xOffset = scaleX(box.width() / 2.0f, canvas)
         val yOffset = scaleY(box.height() / 2.0f, canvas)
         val left = centerX - xOffset
         val right = centerX + xOffset
         val top = centerY - yOffset
         val bottom = centerY + yOffset
-        canvas.drawRect(
-            left,
-            top,
-            right,
-            bottom,
-            boundsPaint)
+        if (sleepy < 0.12)
+            canvas.drawRect(
+                left,
+                top,
+                right,
+                bottom,
+                boundsPaint1)
+        else
+            canvas.drawRect(
+                left,
+                top,
+                right,
+                bottom,
+                boundsPaint0)
     }
 
     /**
