@@ -50,6 +50,7 @@ class FaceDetector(private val faceBoundsOverlay: FaceBoundsOverlay){
             firebaseFaceDetectorWrapper.process(
                 image = convertFrameToImage(frame),
                 onSuccess = {
+                    faceBoundsOverlay.clearFaces()
                     faceBoundsOverlay.updateFaces(convertToListOfFaceBounds(it, full_Image = full_image))
                 },
                 onError = {
