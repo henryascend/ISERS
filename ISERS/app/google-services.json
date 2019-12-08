@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "351210392738",
+    "firebase_url": "https://face-detector-fbe33.firebaseio.com",
+    "project_id": "face-detector-fbe33",
+    "storage_bucket": "face-detector-fbe33.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:351210392738:android:0c766b0689ba3f86281bfb",
+        "android_client_info": {
+          "package_name": "henryascend.io.isers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "351210392738-akk594ep01tkc2nktqu2on89sag95klg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnfGWFfBITnXmnntmgl2rR25c0cq8Dptw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "351210392738-akk594ep01tkc2nktqu2on89sag95klg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

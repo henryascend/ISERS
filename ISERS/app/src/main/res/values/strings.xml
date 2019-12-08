@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ISERS</string>
+    <string name="portPlaceholder">Port</string>
+    <string name="EnterRecognitionLabel">Click here to enter RECOGNITION. You could detect the real-time emotion of the students in the classroom.</string>
+    <string name="EnterRecognitionButton">Enter Recognition</string>
+    <string name="EnterStreamingLabel">Click here to enter STREAMING. You could Display the emotion recognition results in a remote sever.</string>
+    <string name="EnterStreamingButton">Enter Streaming</string>
+</resources>
