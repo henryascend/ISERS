@@ -7,22 +7,29 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.controls.Facing
 import henryascend.io.isers.Classifier.EmotionIdentify
 import henryascend.io.isers.facedetector.FaceBoundsOverlay
+import henryascend.io.isers.facedetector.FaceDetector
+import henryascend.io.isers.facedetector.FaceDetector1
+import henryascend.io.isers.models.Frame
+import henryascend.io.isers.models.Size
+import java.io.OutputStream
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.Socket
 
 class StreamingActivity : AppCompatActivity() {
     private var recording = false
-    private lateinit var recorder: AudioRecord
     private lateinit var socket: Socket
 
     private lateinit var hostField: EditText
@@ -31,13 +38,16 @@ class StreamingActivity : AppCompatActivity() {
     private lateinit var resultsLabel: TextView
 
 
-
-    private lateinit var trainValue: String
-    private lateinit var classifyValue: String
-
     private lateinit var cameraView: CameraView
     private lateinit var faceBoundsOverlay: FaceBoundsOverlay
     private lateinit var emotionIdentify: EmotionIdentify
+
+    private val faceDetector: FaceDetector1 by lazy{
+        FaceDetector1(faceBoundsOverlay)
+    }
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +60,6 @@ class StreamingActivity : AppCompatActivity() {
         cameraView.facing = Facing.BACK
 
 
-
         this.checkPermissions()
 
         hostField = findViewById(R.id.host)
@@ -58,14 +67,12 @@ class StreamingActivity : AppCompatActivity() {
         startButton = findViewById(R.id.start)
         resultsLabel = findViewById(R.id.results)
 
+        emotionIdentify = EmotionIdentify.classifier(assets,"converted_model.tflite")
 
 
-        val actions = resources.getStringArray(R.array.actions)
-
-        trainValue = actions[0]
-        classifyValue = actions[1]
 
     }
+
 
     fun startClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         if (this.recording) {
@@ -91,11 +98,6 @@ class StreamingActivity : AppCompatActivity() {
         }
     }
 
-    private val sampleRate = 44100
-    private val channelConfig = AudioFormat.CHANNEL_IN_MONO
-    private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-    private val minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-
     private fun start() {
         this.startButton.text = "Stop"
         this.hostField.isEnabled = false
@@ -108,28 +110,25 @@ class StreamingActivity : AppCompatActivity() {
 
                 val output = socket.getOutputStream()
 
-                var action = "0"
+                var action = System.currentTimeMillis()
 
                 output.write("${action}\u0004".toByteArray(Charsets.UTF_8))
                 output.flush()
 
                 try {
-                    recorder = AudioRecord(
-                        MediaRecorder.AudioSource.MIC,
-                        sampleRate,
-                        channelConfig,
-                        audioFormat,
-                        minBufSize * 10
-                    )
-
-                    recorder.startRecording()
-
-                    val buffer = ByteArray(minBufSize)
-
-                    while (this.recording) { //reading data from MIC into buffer
-                        recorder.read(buffer, 0, buffer.size)
-
-                        output.write(buffer)
+                    this.cameraView.addFrameProcessor {
+                        Log.v("width & height", ""+it.size.width + " "+it.size.height)
+                        faceDetector.process( Frame(
+                            data = it.data,
+                            rotation = it.rotation,
+                            size = Size(it.size.width, it.size.height),
+                            format = it.format,
+                            isCameraFacingBack = cameraView.facing == Facing.BACK
+                        ), emotionIdentify)
+                        faceDetector.getFaceImages().forEach {
+                            Log.v("bytearray",""+it)
+                            output.write(it)
+                        }
                     }
                 } catch (err: Exception) {
                     runOnUiThread {
@@ -142,6 +141,8 @@ class StreamingActivity : AppCompatActivity() {
 
                 try {
                     this.disconnect()
+                    //faceBoundsOverlay.clearFaces()
+                    //cameraView.clearFrameProcessors()
                 } catch (err: Exception) {
                     runOnUiThread {
                         this.stop()
@@ -151,16 +152,6 @@ class StreamingActivity : AppCompatActivity() {
                     }
                 }
 
-                try {
-                    this.recorder.release()
-                } catch (err: Exception) {
-                    runOnUiThread {
-                        this.stop()
-                        resultsLabel.text = "Failed to stop recorder:\n" +
-                                "${getStack(err)}\n\n" +
-                                "${resultsLabel.text}"
-                    }
-                }
             } catch (err: Exception) {
                 runOnUiThread {
                     this.stop()
@@ -172,11 +163,14 @@ class StreamingActivity : AppCompatActivity() {
         }
     }
 
+
     private fun stop() {
         this.recording = false
         this.startButton.text = "Start"
         this.hostField.isEnabled = true
         this.portField.isEnabled = true
+        faceBoundsOverlay.clearFaces()
+        cameraView.clearFrameProcessors()
     }
 
     private fun getStack(err: Exception): String {
@@ -186,4 +180,6 @@ class StreamingActivity : AppCompatActivity() {
 
         return writer.toString()
     }
+
+
 }

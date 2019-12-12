@@ -86,9 +86,12 @@ class FaceBoundsOverlay @JvmOverloads constructor(
             val centerX = computeFaceBoundsCenterX(width.toFloat() ,  scaleX(it.box.exactCenterX(), canvas) )
             val centerY = computeFaceBoundsCenterY(height.toFloat(), scaleY(it.box.exactCenterY(), canvas) )
             drawAnchor(canvas,centerX,centerY)
-            drawId(canvas,it.id.toString(),centerX,centerY,emotionlabel[it.status] )
+            if (it.sleepy > 0.10)
+                 drawId(canvas,it.id.toString(),centerX,centerY,emotionlabel[it.status] )
             drawBounds(it.box,canvas,centerX, centerY, it.sleepy)
         }
+
+
     }
 
     /**
@@ -154,20 +157,20 @@ class FaceBoundsOverlay @JvmOverloads constructor(
         val right = centerX + xOffset
         val top = centerY - yOffset
         val bottom = centerY + yOffset
-        if (sleepy < 0.12)
-            canvas.drawRect(
-                left,
-                top,
-                right,
-                bottom,
-                boundsPaint1)
-        else
+        if (sleepy > 0.1)
             canvas.drawRect(
                 left,
                 top,
                 right,
                 bottom,
                 boundsPaint0)
+        else
+            canvas.drawRect(
+                left,
+                top,
+                right,
+                bottom,
+                boundsPaint1)
     }
 
     /**

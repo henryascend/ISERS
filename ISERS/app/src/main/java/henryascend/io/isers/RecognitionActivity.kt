@@ -58,11 +58,6 @@ class RecognitionActivity : AppCompatActivity(){
             ), emotionIdentify
            )
         }
-
-//        revertCameraButton.setOnClickListener {
-//                cameraView.toggleFacing()
-//                faceBoundsOverlay.clearFaces()
-//        }
     }
 
 
