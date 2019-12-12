@@ -107,10 +107,6 @@ class StreamingActivity : AppCompatActivity() {
         AsyncTask.execute {
             try {
 
-//
-//                val output = socket.getOutputStream()
-
-
                 var action = System.currentTimeMillis()
 
                 //output.write("${action}\u0004".toByteArray(Charsets.UTF_8))
@@ -129,8 +125,9 @@ class StreamingActivity : AppCompatActivity() {
                         faceDetector.getFaceImages().forEach {
                             this.connect()
                             val output = socket.getOutputStream()
-                            Log.v("bytearray",""+it)
-                            output.write(it)
+                            //Log.v("bytearray",""+it)
+                            output.write("${it.status.toString()}\u0004".toByteArray())
+                            output.write(it.face)
                             output.flush()
                             output.close()
                             this.disconnect()

@@ -5,6 +5,8 @@ import string
 import random
 from typing import Optional, Callable, AnyStr
 
+import time, datetime
+
 try:
     from thread import start_new_thread
 except:
@@ -36,49 +38,55 @@ def static_vars(**kwargs):
 def uuid() -> AnyStr:
     return ''.join(random.choices(uuid.alphabet, k=8))
 
-# def readFrom(connection: socket, callback: Optional[Callable[[bytearray], None]] = None, eot: Optional[bytes] = None) -> bytearray:
-#     datas = bytearray()
 
-#     while True:
-#         data = connection.recv(1024)
+def readFrom(connection: socket, callback: Optional[Callable[[bytearray], None]] = None, eot: Optional[bytes] = None) -> bytearray:
+    datas = bytearray()
 
-#         if not data:
-#             break
+    while True:
+        data = connection.recv(1024)
 
-#         datas.extend(data)
+        if not data:
+            break
 
-#         if eot is not None and data.endswith(eot):
-#             del datas[len(datas) - len(eot) : len(datas)]
+        datas.extend(data)
 
-#             if callback is not None:
-#                 callback(data[0:len(data) - len(eot)])
+        if eot is not None and data.endswith(eot):
+            del datas[len(datas) - len(eot) : len(datas)]
 
-#             break
+            if callback is not None:
+                callback(data[0:len(data) - len(eot)])
 
-#         if callback is not None:
-#             callback(data)
+            break
 
-#     return datas
+        if callback is not None:
+            callback(data)
+
+    return datas    
+
 
 def handleConnection(connection):
-    # id = uuid()
-    #print(f"Connected client {id}")
 
-    filename = "unsupported-action.txt"
 
-    print(f"Client wants to write. Writing to file {filename}.")
+    filename =  str(round(time.time()*1000))
 
-    #file = os.open(filename, "w")
-    #readFrom(connection, lambda data : file.writeframes(data))
-    #readFrom(connection)
+    status= readFrom(connection, eot = u"\u0004".encode('utf-8')).decode('utf-8').split()[0]
 
-    data = connection.recv(1024)
+    #print(status)
+
+    data = readFrom(connection)
+
+    #print(data)
+    
+    print(f"Client wants to write. Writing to file {filename}_{status}.")
+
+    
     if data:
                     # output received data
-        print ("Data: %s" % data)
-    else:
-                    # no more data -- quit the loop
-        print ("no more data.")
+            f = open(f'faceImages/{filename}_{str(status)}.png', 'wb')
+            f.write(data)
+            f.close()
+            print("success")
+
 
     connection.close()
 

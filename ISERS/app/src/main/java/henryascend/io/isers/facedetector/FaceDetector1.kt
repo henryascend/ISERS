@@ -10,6 +10,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import henryascend.io.isers.Classifier.EmotionIdentify
 import henryascend.io.isers.models.FaceBounds
+import henryascend.io.isers.models.FaceDocuments
 import henryascend.io.isers.models.Frame
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
@@ -23,7 +24,7 @@ class FaceDetector1 (private val faceBoundsOverlay: FaceBoundsOverlay){
     private lateinit var classifiermodel: EmotionIdentify
 
     private lateinit var  Bounds: List<FaceBounds>
-    private val faceImages : MutableList<ByteArray> = mutableListOf()
+    private val faceImages : MutableList<FaceDocuments> = mutableListOf()
 
 
     fun process(frame: Frame, model : EmotionIdentify){
@@ -33,7 +34,7 @@ class FaceDetector1 (private val faceBoundsOverlay: FaceBoundsOverlay){
         classifiermodel = model
     }
 
-    fun getFaceImages() : MutableList<ByteArray> {
+    fun getFaceImages() : MutableList<FaceDocuments> {
         return faceImages
     }
 
@@ -106,11 +107,11 @@ class FaceDetector1 (private val faceBoundsOverlay: FaceBoundsOverlay){
         Log.v("recognition", ""+recognition)
 
         var stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-        var byteArray: ByteArray = stream.toByteArray()
+        reshape.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        var byteArray: ByteArray =  stream.toByteArray()
 
 
-        faceImages.add(byteArray)
+        faceImages.add( FaceDocuments(byteArray, recognition) )
 
         stream.close()
         bitmap.recycle()
