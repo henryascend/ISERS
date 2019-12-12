@@ -110,10 +110,11 @@ class StreamingActivity : AppCompatActivity() {
 
                 val output = socket.getOutputStream()
 
+
                 var action = System.currentTimeMillis()
 
-                output.write("${action}\u0004".toByteArray(Charsets.UTF_8))
-                output.flush()
+                //output.write("${action}\u0004".toByteArray(Charsets.UTF_8))
+                //output.flush()
 
                 try {
                     this.cameraView.addFrameProcessor {
@@ -128,6 +129,7 @@ class StreamingActivity : AppCompatActivity() {
                         faceDetector.getFaceImages().forEach {
                             Log.v("bytearray",""+it)
                             output.write(it)
+                            output.flush()
                         }
                     }
                 } catch (err: Exception) {
@@ -141,6 +143,7 @@ class StreamingActivity : AppCompatActivity() {
 
                 try {
                     this.disconnect()
+                    output.close()
                     //faceBoundsOverlay.clearFaces()
                     //cameraView.clearFrameProcessors()
                 } catch (err: Exception) {

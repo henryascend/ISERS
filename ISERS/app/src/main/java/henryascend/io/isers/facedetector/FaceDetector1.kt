@@ -112,6 +112,7 @@ class FaceDetector1 (private val faceBoundsOverlay: FaceBoundsOverlay){
 
         faceImages.add(byteArray)
 
+        stream.close()
         bitmap.recycle()
         return recognition
 

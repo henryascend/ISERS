@@ -1,7 +1,6 @@
 import socket
 import sys
 import os
-import wave
 import string
 import random
 from typing import Optional, Callable, AnyStr
@@ -37,67 +36,53 @@ def static_vars(**kwargs):
 def uuid() -> AnyStr:
     return ''.join(random.choices(uuid.alphabet, k=8))
 
-def readFrom(connection: socket, callback: Optional[Callable[[bytearray], None]] = None, eot: Optional[bytes] = None) -> bytearray:
-    datas = bytearray()
+# def readFrom(connection: socket, callback: Optional[Callable[[bytearray], None]] = None, eot: Optional[bytes] = None) -> bytearray:
+#     datas = bytearray()
 
-    while True:
-        data = connection.recv(1024)
+#     while True:
+#         data = connection.recv(1024)
 
-        if not data:
-            break
+#         if not data:
+#             break
 
-        datas.extend(data)
+#         datas.extend(data)
 
-        if eot is not None and data.endswith(eot):
-            del datas[len(datas) - len(eot) : len(datas)]
+#         if eot is not None and data.endswith(eot):
+#             del datas[len(datas) - len(eot) : len(datas)]
 
-            if callback is not None:
-                callback(data[0:len(data) - len(eot)])
+#             if callback is not None:
+#                 callback(data[0:len(data) - len(eot)])
 
-            break
+#             break
 
-        if callback is not None:
-            callback(data)
+#         if callback is not None:
+#             callback(data)
 
-    return datas
+#     return datas
 
 def handleConnection(connection):
-    id = uuid()
+    # id = uuid()
+    #print(f"Connected client {id}")
 
-    print(f"Connected client {id}")
+    filename = "unsupported-action.txt"
 
-    action = readFrom(connection, eot = u"\u0004".encode('utf-8')).decode('utf-8').split()
+    print(f"Client wants to write. Writing to file {filename}.")
 
-    filename = "unsupported-action.wav"
+    #file = os.open(filename, "w")
+    #readFrom(connection, lambda data : file.writeframes(data))
+    #readFrom(connection)
 
-    if action[0] == "Train":
-        maybeName = f"audio_raw_training/{action[1]}s"
-
-        if os.path.isfile(f"{maybeName}.wav"):
-            suffix = 0
-
-            while True:
-                suffix += 1
-
-                if not os.path.isfile(f"{maybeName}-{suffix}.wav"):
-                    maybeName = f"{maybeName}-{suffix}"
-                    break
-
-        filename = f"{maybeName}.wav"
-    elif action[0] == "Classify":
-        filename = f"audio_raw_classification/{id}.wav"
-
-    print(f"Client wants to {action[0].lower()}. Writing to file {filename}.")
-
-    file = wave.open(filename, "w")
-    file.setnchannels(1)
-    file.setsampwidth(2)
-    file.setframerate(44100)
-    readFrom(connection, lambda data : file.writeframes(data))
+    data = connection.recv(1024)
+    if data:
+                    # output received data
+        print ("Data: %s" % data)
+    else:
+                    # no more data -- quit the loop
+        print ("no more data.")
 
     connection.close()
 
-    print(f"Disconnected client {id}")
+    ##print(f"Disconnected client {id}")
 
 while True:
     connection, address = server.accept()
