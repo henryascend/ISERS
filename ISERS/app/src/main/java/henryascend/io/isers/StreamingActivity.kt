@@ -106,9 +106,9 @@ class StreamingActivity : AppCompatActivity() {
 
         AsyncTask.execute {
             try {
-                this.connect()
 
-                val output = socket.getOutputStream()
+//
+//                val output = socket.getOutputStream()
 
 
                 var action = System.currentTimeMillis()
@@ -127,9 +127,13 @@ class StreamingActivity : AppCompatActivity() {
                             isCameraFacingBack = cameraView.facing == Facing.BACK
                         ), emotionIdentify)
                         faceDetector.getFaceImages().forEach {
+                            this.connect()
+                            val output = socket.getOutputStream()
                             Log.v("bytearray",""+it)
                             output.write(it)
                             output.flush()
+                            output.close()
+                            this.disconnect()
                         }
                     }
                 } catch (err: Exception) {
@@ -141,19 +145,19 @@ class StreamingActivity : AppCompatActivity() {
                     }
                 }
 
-                try {
-                    this.disconnect()
-                    output.close()
-                    //faceBoundsOverlay.clearFaces()
-                    //cameraView.clearFrameProcessors()
-                } catch (err: Exception) {
-                    runOnUiThread {
-                        this.stop()
-                        resultsLabel.text = "Failed to disconnect socket:\n" +
-                                "${getStack(err)}\n\n" +
-                                "${resultsLabel.text}"
-                    }
-                }
+//                try {
+//                    this.disconnect()
+//                    //output.close()
+//                    //faceBoundsOverlay.clearFaces()
+//                    //cameraView.clearFrameProcessors()
+//                } catch (err: Exception) {
+//                    runOnUiThread {
+//                        this.stop()
+//                        resultsLabel.text = "Failed to disconnect socket:\n" +
+//                                "${getStack(err)}\n\n" +
+//                                "${resultsLabel.text}"
+//                    }
+//                }
 
             } catch (err: Exception) {
                 runOnUiThread {
