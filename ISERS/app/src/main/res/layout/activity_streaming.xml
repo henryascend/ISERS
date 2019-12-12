@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".StreamingActivity">
 
+    <include layout="@layout/content_recognition" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -18,58 +20,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:text="@string/tapToStartDescription"
-            android:textSize="18sp" />
+
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="16dp" />
+            android:layout_height="320dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
-            <Spinner
-                android:id="@+id/actionSpinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:entries="@array/actions"
-                android:padding="8dp"
-                android:textSize="18sp" />
 
-            <Space
-                android:id="@+id/trainingCharSpace"
-                android:layout_width="16dp"
-                android:layout_height="match_parent" />
-
-            <TextView
-                android:id="@+id/trainingCharLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center_vertical|right"
-                android:text="Training Char:"
-                android:textSize="18sp" />
-
-            <Spinner
-                android:id="@+id/trainingCharSpinner"
-                android:layout_width="72dp"
-                android:layout_height="wrap_content"
-                android:entries="@array/trainOptions"
-                android:padding="8dp"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="16dp" />
 
         <LinearLayout
             android:layout_width="match_parent"

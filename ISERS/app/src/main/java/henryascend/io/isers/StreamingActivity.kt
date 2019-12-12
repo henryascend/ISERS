@@ -12,6 +12,10 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.controls.Facing
+import henryascend.io.isers.Classifier.EmotionIdentify
+import henryascend.io.isers.facedetector.FaceBoundsOverlay
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.Socket
@@ -26,17 +30,26 @@ class StreamingActivity : AppCompatActivity() {
     private lateinit var startButton: Button
     private lateinit var resultsLabel: TextView
 
-    private lateinit var actionSpinner: Spinner
-    private lateinit var trainingCharSpace: Space
-    private lateinit var trainingCharLabel: TextView
-    private lateinit var trainingCharSpinner: Spinner
+
 
     private lateinit var trainValue: String
     private lateinit var classifyValue: String
 
+    private lateinit var cameraView: CameraView
+    private lateinit var faceBoundsOverlay: FaceBoundsOverlay
+    private lateinit var emotionIdentify: EmotionIdentify
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_streaming)
+
+        cameraView = findViewById(R.id.cameraView)
+        cameraView.setLifecycleOwner(this)
+        faceBoundsOverlay = findViewById(R.id.faceboundsoverlay)
+        cameraView.setPreviewFrameRate(30F)
+        cameraView.facing = Facing.BACK
+
+
 
         this.checkPermissions()
 
@@ -45,35 +58,13 @@ class StreamingActivity : AppCompatActivity() {
         startButton = findViewById(R.id.start)
         resultsLabel = findViewById(R.id.results)
 
-        actionSpinner = findViewById(R.id.actionSpinner)
 
-        trainingCharSpace = findViewById(R.id.trainingCharSpace)
-        trainingCharLabel = findViewById(R.id.trainingCharLabel)
-        trainingCharSpinner = findViewById(R.id.trainingCharSpinner)
 
         val actions = resources.getStringArray(R.array.actions)
 
         trainValue = actions[0]
         classifyValue = actions[1]
 
-        actionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                when (actionSpinner.selectedItem.toString()) {
-                    trainValue -> {
-                        trainingCharSpace.visibility = View.VISIBLE
-                        trainingCharLabel.visibility = View.VISIBLE
-                        trainingCharSpinner.visibility = View.VISIBLE
-                    }
-                    classifyValue -> {
-                        trainingCharSpace.visibility = View.GONE
-                        trainingCharLabel.visibility = View.GONE
-                        trainingCharSpinner.visibility = View.GONE
-                    }
-                }
-            }
-        }
     }
 
     fun startClicked(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -117,11 +108,7 @@ class StreamingActivity : AppCompatActivity() {
 
                 val output = socket.getOutputStream()
 
-                var action = actionSpinner.selectedItem.toString()
-
-                if (action.equals(trainValue)) {
-                    action += " ${trainingCharSpinner.selectedItem}"
-                }
+                var action = "0"
 
                 output.write("${action}\u0004".toByteArray(Charsets.UTF_8))
                 output.flush()
