@@ -13,5 +13,5 @@ To build a connection,
 
 1. run the server: run `run python server.py`
 
-2. connect the smartphone with the sever: type in the IP address and port number of the sever in the `Streaming Mode`, `Start` to stream the emotion analytical results.
+2. connect the smartphone with the sever: type in the IP address and port number of the sever in the `Streaming Mode`, `Start` to stream the emotion analytical results. The results are stored in the `faceImages` folder.
 
