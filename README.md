@@ -1,5 +1,5 @@
 # In-class Student Emotion Recognition System (ISERS)
-This is a system for the in-class emotion recognition of student to improve the quality of the course.
+This is a system for the in-class emotion recognition of students to improve the quality of the course.
 
 ## To Run
 
