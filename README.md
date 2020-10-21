@@ -5,7 +5,7 @@ This is a system for the in-class emotion recognition of student to improve the 
 
 ### Application
 
-To build an APK for the installation of the android application, simply open the ISERS document in the Android Studio to launch the project. Then click `Build`, `Build APK` in the menu to create the APK. We test the the application in a Samsung Galaxy S7, both modes work properly.
+To build an APK for the installation of the android application, simply open the ISERS document in the Android Studio to launch the project. Then click `Build`, `Build APK` in the menu to create the APK. We test the application in a Samsung Galaxy S7, both modes work properly.
 
 ### Server
 
